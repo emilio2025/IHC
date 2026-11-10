@@ -1,0 +1,141 @@
+---
+import App from '../layouts/App.astro';
+import Spinner from '../components/Spinner.astro';
+import Modal from '../components/Modal.astro';
+import { LISTAS, BIBLIOTECA } from '../data/mock';
+const card = 'bg-neutral-primary-soft border border-default rounded-base shadow-xs p-5';
+const label = 'font-mono text-[11px] tracking-[.14em] text-brand uppercase';
+const btnSec = 'inline-flex items-center text-heading bg-neutral-tertiary border border-default hover:bg-neutral-tertiary-medium focus:ring-4 focus:ring-brand-medium font-medium rounded-base text-sm px-4 py-2.5 focus:outline-none';
+const btnPri = 'press inline-flex items-center text-gray-950 bg-brand hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium font-bold rounded-base text-sm px-4 py-2.5 focus:outline-none';
+const filtros = ['Todo', 'Huayno', 'Vals criollo', 'Cumbia', 'Cuña', 'Jingle'];
+---
+<App title="Música" active="Música">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+  <!-- BIBLIOTECA -->
+  <section class={`${card} lg:col-span-8`}>
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <p class={label}>Biblioteca musical</p>
+        <h1 class="font-heading font-bold text-heading text-2xl mt-1">Música de la radio</h1>
+        <p class="text-sm mt-1"><span id="total">{BIBLIOTECA.length}</span> elementos · 86 h · 42 cuñas y jingles</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- Búsqueda con historial (Actividad 9: reconocer en vez de recordar) -->
+        <div class="relative w-64">
+          <svg class="w-4 h-4 absolute start-3 top-1/2 -translate-y-1/2 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input id="buscar" type="search" autocomplete="off" class="block w-full ps-9 pe-3 py-2.5 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand" placeholder="Buscar canción o artista…" />
+          <div id="historial" class="hidden absolute z-20 mt-2 w-full bg-neutral-primary-medium border border-brand/40 rounded-base shadow-lg p-2">
+            <p class="font-mono text-[10px] tracking-widest px-2 py-1">BÚSQUEDAS RECIENTES</p>
+            <div id="recientes"></div>
+            <p class="font-mono text-[10px] tracking-widest px-2 py-1 mt-1">MÁS PEDIDAS HOY</p>
+            <button class="hist w-full text-start px-2 py-1.5 rounded-base hover:bg-neutral-tertiary-medium text-sm text-heading" data-q="Adiós pueblo de Ayacucho">Adiós pueblo de Ayacucho <span class="text-xs text-body">· 12 pedidos</span></button>
+            <button class="hist w-full text-start px-2 py-1.5 rounded-base hover:bg-neutral-tertiary-medium text-sm text-heading" data-q="La flor de la canela">La flor de la canela <span class="text-xs text-body">· 7 pedidos</span></button>
+          </div>
+        </div>
+        <button id="btn-subir" type="button" class={btnPri}>⇪ Subir canciones</button>
+      </div>
+    </div>
+    <!-- Filtros (Flowbite: pills) -->
+    <ul id="filtros" class="flex flex-wrap gap-1 mt-4 text-sm font-medium bg-neutral-tertiary border border-default rounded-base p-1 w-fit">
+      {filtros.map((f, i) => <li><button type="button" data-f={f} class={`filtro px-3 py-1.5 rounded-base ${i === 0 ? 'bg-brand text-gray-950 font-bold' : 'text-body hover:text-heading'}`}>{f}</button></li>)}
+    </ul>
+    <!-- Tabla (Flowbite: table) -->
+    <div class="relative overflow-x-auto mt-4 border border-default rounded-base">
+      <table class="w-full text-sm text-left text-body">
+        <thead class="text-xs uppercase bg-neutral-tertiary border-b border-default font-mono tracking-wider">
+          <tr><th class="px-4 py-3">Canción</th><th class="px-4 py-3">Género</th><th class="px-4 py-3">Duración</th><th class="px-4 py-3" data-niveles="avanzado">Reprod. 7 d</th><th class="px-4 py-3 text-end">Acciones</th></tr>
+        </thead>
+        <tbody id="filas"></tbody>
+      </table>
+      <div id="vacio" class="hidden text-center py-10">
+        <p class="text-heading font-semibold">No hay resultados</p>
+        <p class="text-sm mt-1">Prueba con otro nombre o quita el filtro. <button id="limpiar" class="text-brand font-semibold">Ver todo</button></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LISTAS -->
+  <div class="lg:col-span-4 space-y-4">
+    <section class={card}>
+      <div class="flex items-center justify-between mb-3"><p class={label}>Listas de reproducción</p><span class="text-xs">Toca para activar</span></div>
+      <ul class="space-y-2.5">
+        {LISTAS.map((l) => (
+          <li class="flex items-center gap-3 p-3 rounded-base border border-default bg-neutral-tertiary">
+            <span class={`w-2.5 h-2.5 rounded-full ${l.color}`}></span>
+            <div class="flex-1"><p class="text-sm font-semibold text-heading">{l.nombre}</p><p class="text-xs font-mono">{l.horario} · {l.canciones} canciones</p></div>
+            <!-- Flowbite: toggle -->
+            <label class="inline-flex items-center cursor-pointer">
+              <input type="checkbox" class="lista-toggle sr-only peer" data-id={l.id} data-nombre={l.nombre} checked={l.activa} />
+              <div class="relative w-9 h-5 bg-neutral-quaternary peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-medium rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-buffer after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand"></div>
+            </label>
+          </li>
+        ))}
+      </ul>
+    </section>
+    <section class={card} data-niveles="intermedio avanzado">
+      <p class={`${label} mb-1`}>Orden · Mañanas andinas</p>
+      <p class="text-xs mb-3">Usa las flechas para reordenar. Se guarda solo.</p>
+      <ol id="orden" class="space-y-2">
+        {['Valicha', 'Adiós pueblo de Ayacucho', 'Flor de retama', 'ID «La voz de Apurímac»'].map((t, i) => (
+          <li class="flex items-center gap-2 p-2.5 rounded-base border border-default bg-neutral-tertiary text-sm">
+            <span class="num font-mono text-brand w-6">{String(i + 1).padStart(2, '0')}</span><span class="flex-1 text-heading">{t}</span>
+            <button class="subir w-7 h-7 rounded-base hover:bg-neutral-tertiary-medium" aria-label="Subir">↑</button><button class="bajar w-7 h-7 rounded-base hover:bg-neutral-tertiary-medium" aria-label="Bajar">↓</button>
+          </li>
+        ))}
+      </ol>
+    </section>
+  </div>
+</div>
+
+<div slot="fuera">
+<!-- Subir canciones (Flowbite: file dropzone + progress) -->
+<Modal id="modal-subir" max="max-w-xl">
+  <p class={label}>Subir canciones</p><h3 class="font-heading font-semibold text-heading text-2xl mt-1">Agregar a la biblioteca</h3>
+  <label for="archivos" class="mt-4 flex flex-col items-center justify-center w-full h-40 bg-neutral-secondary-medium border border-dashed border-default-strong rounded-base cursor-pointer hover:bg-neutral-tertiary-medium">
+    <p class="text-heading font-semibold">Arrastra tus MP3 aquí o haz clic para elegir</p>
+    <p class="text-xs mt-1">MP3, FLAC u OGG · hasta 50 MB por archivo</p>
+    <input id="archivos" type="file" class="hidden" multiple accept="audio/*" />
+  </label>
+  <button id="btn-ejemplo" type="button" class="mt-2 text-xs text-brand hover:underline">Usar 3 archivos de ejemplo</button>
+  <ul id="subidas" class="mt-3 space-y-3"></ul>
+  <div class="flex justify-end gap-3 mt-5"><button data-cerrar="modal-subir" type="button" class={btnSec}>Cerrar</button></div>
+</Modal>
+
+<!-- Editar metadatos con género predictivo (Actividad 8) -->
+<Modal id="modal-editar">
+  <p class={label}>Editar metadatos</p><h3 id="ed-titulo" class="font-heading font-semibold text-heading text-2xl mt-1"></h3>
+  <label class="block mt-4 mb-2 text-sm font-medium text-heading" for="ed-genero">Género</label>
+  <div class="relative">
+    <input id="ed-genero" type="text" autocomplete="off" class="block w-full px-3 py-2.5 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand" placeholder="Escribe 2–3 letras: «hua», «val»…" />
+    <ul id="ed-sug" class="hidden absolute z-10 mt-1 w-full bg-neutral-primary-medium border border-brand/40 rounded-base shadow-lg p-1"></ul>
+  </div>
+  <p class="text-xs mt-3 mb-2">O elige por categoría:</p>
+  <ul id="ed-cats" class="flex text-sm font-medium bg-neutral-tertiary border border-default rounded-base p-1 gap-1"></ul>
+  <div id="ed-opciones" class="flex flex-wrap gap-2 mt-3"></div>
+  <p class="text-xs mt-3">Usados hace poco: <button class="ed-rec text-heading underline" data-g="Huayno">Huayno</button> · <button class="ed-rec text-heading underline" data-g="Vals criollo">Vals criollo</button></p>
+  <div class="flex justify-between gap-3 mt-6">
+    <button data-cerrar="modal-editar" type="button" class={btnSec}>Cancelar</button>
+    <button id="ed-guardar" type="button" class={btnPri}><span class="spin hidden"><Spinner /></span><span class="txt">Guardar metadatos</span></button>
+  </div>
+</Modal>
+
+<!-- Eliminar duplicado (Actividad 9: escribir nombre + casilla) -->
+<Modal id="modal-eliminar" borde="border-onair/50">
+  <p class="font-mono text-[11px] tracking-[.14em] text-fg-danger uppercase">Acción irreversible · eliminar de la biblioteca</p>
+  <h3 class="font-heading font-semibold text-heading text-2xl mt-1">Eliminar «<span class="el-nombre"></span>»</h3>
+  <ul class="mt-4 p-3 rounded-base bg-danger-soft border border-danger-subtle text-sm text-fg-danger space-y-1 list-disc ps-6">
+    <li>Se quitará de 2 listas: Mañanas andinas y Huaynos de oro.</li><li>Se borrará el archivo del servidor AzuraCast.</li><li>Solo podrás deshacerlo durante 10 segundos.</li>
+  </ul>
+  <label for="el-input" class="block mb-2 mt-4 text-sm font-medium text-heading">Para confirmar, escribe el nombre exacto: <span class="el-nombre font-mono text-fg-danger"></span></label>
+  <input id="el-input" type="text" autocomplete="off" class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 font-mono" />
+  <div class="flex items-center mt-4"><input id="el-check" type="checkbox" class="w-4 h-4 border border-default-medium rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft" /><label for="el-check" class="ms-2 text-sm font-medium text-heading">Entiendo que también se quitará de 2 listas</label></div>
+  <p id="el-error" class="hidden mt-3 text-sm text-fg-danger font-semibold">Falta escribir el nombre exacto o marcar la casilla.</p>
+  <div class="flex justify-between gap-3 mt-6">
+    <button data-cerrar="modal-eliminar" type="button" class={btnSec}>Cancelar</button>
+    <button id="el-confirmar" type="button" class="press inline-flex items-center text-white bg-danger hover:bg-danger-strong font-bold rounded-base text-sm px-5 py-2.5 opacity-40 cursor-not-allowed"><span class="spin hidden"><Spinner /></span><span class="txt">Eliminar canción</span></button>
+  </div>
+</Modal>
+<template id="tpl-spin"><Spinner class="w-3.5 h-3.5 me-1.5" /></template>
+</div>
+<script src="../scripts/musica.ts"></script>
+</App>

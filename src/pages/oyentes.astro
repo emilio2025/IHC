@@ -1,0 +1,66 @@
+---
+import App from '../layouts/App.astro';
+import Spinner from '../components/Spinner.astro';
+import { CIUDADES, PLATAFORMAS } from '../data/mock';
+const card = 'bg-neutral-primary-soft border border-default rounded-base shadow-xs p-5';
+const label = 'font-mono text-[11px] tracking-[.14em] text-brand uppercase';
+const kpis = [['Oyentes ahora', 'k-ahora', '128', '+12 % vs. ayer'], ['Pico de hoy', 'k-pico', '164', 'a las 08:15'], ['Escucha promedio', 'k-prom', '23 min', 'por oyente'], ['Mensajes sin leer', 'k-msg', '4', 'WhatsApp, Facebook y web']];
+---
+<App title="Oyentes" active="Oyentes">
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+  {kpis.map(([t, id, v, s], i) => (
+    <section class={card} data-niveles={i === 2 ? 'intermedio avanzado' : undefined}>
+      <p class={label}>{t}</p>
+      <p id={id} class="font-mono font-bold text-heading text-4xl mt-2 tabular">{v}</p>
+      <p class={`text-xs mt-1 ${i === 0 ? 'text-fg-success font-semibold' : ''}`}>{s}</p>
+    </section>
+  ))}
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+  <section class={`${card} lg:col-span-8`} data-niveles="intermedio avanzado">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div><p class={label}>Audiencia por hora</p><h1 class="font-heading font-bold text-heading text-2xl mt-1">Hoy frente a ayer</h1></div>
+      <button id="btn-reporte" type="button" data-niveles="avanzado" class="press inline-flex items-center text-gray-950 bg-brand hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium font-bold rounded-base text-sm px-4 py-2.5"><span class="spin hidden"><Spinner /></span><span class="txt">⇩ Reporte para anunciantes</span></button>
+    </div>
+    <!-- Flowbite charts (ApexCharts) -->
+    <div id="grafico" class="mt-4 min-h-72"></div>
+  </section>
+
+  <section class={`${card} lg:col-span-4`}>
+    <div class="flex items-center justify-between mb-3"><p class={label}>Mensajes de oyentes</p><span id="badge-msg" class="bg-success-soft text-fg-success border border-brand/40 text-xs font-semibold px-2 py-0.5 rounded-full">4 nuevos</span></div>
+    <ul id="mensajes" class="space-y-3"></ul>
+    <p id="sin-msg" class="hidden text-sm text-center py-6">No hay mensajes nuevos. Los que lleguen por WhatsApp, Facebook o la web aparecerán aquí.</p>
+  </section>
+
+  <section class={`${card} lg:col-span-4`} data-niveles="intermedio avanzado">
+    <p class={`${label} mb-3`}>¿Desde dónde escuchan?</p>
+    <ul class="space-y-3">
+      {CIUDADES.map(([c, p]) => (
+        <li><div class="flex justify-between text-sm mb-1"><span class="text-heading">{c}</span><span class="font-mono">{p} %</span></div>
+          <div class="w-full bg-neutral-tertiary-medium rounded-full h-2"><div class="bg-aqua h-2 rounded-full" style={`width:${p}%`}></div></div></li>
+      ))}
+    </ul>
+  </section>
+  <section class={`${card} lg:col-span-4`} data-niveles="avanzado">
+    <p class={`${label} mb-3`}>Por plataforma</p>
+    <ul class="space-y-3">
+      {PLATAFORMAS.map(([c, p]) => (
+        <li><div class="flex justify-between text-sm mb-1"><span class="text-heading">{c}</span><span class="font-mono">{p} %</span></div>
+          <div class="w-full bg-neutral-tertiary-medium rounded-full h-2"><div class="bg-brand h-2 rounded-full" style={`width:${p}%`}></div></div></li>
+      ))}
+    </ul>
+    <p class="text-xs mt-3">La radio FM se estima con encuestas; web y app vienen de AzuraCast.</p>
+  </section>
+  <section class={`${card} lg:col-span-4`} data-niveles="intermedio avanzado">
+    <p class={`${label} mb-3`}>Programas más escuchados</p>
+    <ol class="space-y-2 text-sm">
+      <li class="flex justify-between"><span class="text-heading">1. Mañanas andinas</span><span class="font-mono">152 prom.</span></li>
+      <li class="flex justify-between"><span class="text-heading">2. La voz de Apurímac</span><span class="font-mono">141 prom.</span></li>
+      <li class="flex justify-between"><span class="text-heading">3. Noticiero regional</span><span class="font-mono">138 prom.</span></li>
+    </ol>
+  </section>
+</div>
+<template id="tpl-spin"><Spinner class="w-3.5 h-3.5 me-1.5" /></template>
+<script src="../scripts/oyentes.ts"></script>
+</App>

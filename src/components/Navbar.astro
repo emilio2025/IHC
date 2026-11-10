@@ -1,0 +1,49 @@
+---
+import { ESTACION } from '../data/mock';
+interface Props { active: string }
+const { active } = Astro.props;
+const tabs: [string, string][] = [['Cabina', '/'], ['Música', '/musica'], ['Parrilla', '/parrilla'], ['Sonido', '/sonido'], ['Oyentes', '/oyentes']];
+---
+<nav class="bg-neutral-primary-soft border border-default rounded-base shadow-xs">
+  <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+    <a href="/" class="flex items-center gap-3" aria-label="Ir a la cabina">
+      <span class="grid place-items-center w-9 h-9 rounded-full bg-amber/15 border border-amber/50 text-amber font-heading font-bold">☀</span>
+      <span class="leading-tight">
+        <span class="block font-heading font-bold text-heading tracking-wide">SOL ANDINO</span>
+        <span class="block font-mono text-[10px] text-brand tracking-widest" data-niveles="avanzado">{ESTACION.frecuencia.toUpperCase()} · {ESTACION.ciudad.toUpperCase()}</span>
+      </span>
+    </a>
+
+    <!-- Pestañas (Flowbite: pills). Sonido no aparece en el nivel básico. -->
+    <ul class="order-last md:order-none w-full md:w-auto flex overflow-x-auto text-sm font-medium text-center bg-neutral-tertiary border border-default rounded-base p-1 gap-1">
+      {tabs.map(([t, href]) => (
+        <li data-niveles={t === 'Sonido' ? 'intermedio avanzado' : undefined} class="shrink-0">
+          <a href={href} aria-current={t === active ? 'page' : undefined}
+             class={t === active ? 'inline-block px-4 py-2 rounded-base bg-brand text-gray-950 font-bold' : 'inline-block px-4 py-2 rounded-base text-body hover:text-heading hover:bg-neutral-tertiary-medium'}>{t}</a>
+        </li>
+      ))}
+    </ul>
+
+    <div class="flex items-center gap-3">
+      <span id="oyentes" class="hidden sm:inline-flex items-center gap-1.5 bg-success-soft text-fg-success border border-brand/40 text-xs font-semibold px-2.5 py-1 rounded-full font-mono tabular">{ESTACION.oyentes} oyentes</span>
+      <span id="reloj" class="font-mono text-sm text-heading tabular">--:--:--</span>
+      <span id="badge-aire" class="whitespace-nowrap inline-flex items-center gap-1.5 bg-danger-soft text-fg-danger border border-onair/50 text-xs font-bold px-2.5 py-1 rounded-full">
+        <span class="w-2 h-2 rounded-full bg-onair pulse-dot"></span><span id="badge-aire-txt">AL AIRE</span>
+      </span>
+
+      <!-- Selector de nivel de interfaz (Flowbite: dropdown) -->
+      <button id="btn-nivel" data-dropdown-toggle="dd-nivel" type="button" class="inline-flex items-center gap-1.5 text-heading bg-neutral-tertiary border border-default hover:bg-neutral-tertiary-medium focus:ring-4 focus:ring-brand-medium font-medium rounded-base text-sm px-3 py-1.5 focus:outline-none">
+        <span id="nivel-txt">Intermedio</span>
+        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div id="dd-nivel" class="z-20 hidden bg-neutral-primary-medium border border-default rounded-base shadow-lg w-60">
+        <ul class="p-2 text-sm text-body">
+          <li><button data-nivel="basico" class="w-full text-start p-2 rounded-base hover:bg-neutral-tertiary-medium"><b class="text-heading">Básico</b><br><span class="text-xs">Solo lo esencial para estar al aire</span></button></li>
+          <li><button data-nivel="intermedio" class="w-full text-start p-2 rounded-base hover:bg-neutral-tertiary-medium"><b class="text-heading">Intermedio</b><br><span class="text-xs">Agrega cola del AutoDJ y registro</span></button></li>
+          <li><button data-nivel="avanzado" class="w-full text-start p-2 rounded-base hover:bg-neutral-tertiary-medium"><b class="text-heading">Avanzado</b><br><span class="text-xs">Agrega servidor y niveles en dB</span></button></li>
+        </ul>
+      </div>
+      <span class="grid place-items-center w-9 h-9 rounded-full bg-brand text-gray-950 text-sm font-bold" title="Emilio Paniagua · en turno">EP</span>
+    </div>
+  </div>
+</nav>

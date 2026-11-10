@@ -1,0 +1,73 @@
+---
+import App from '../layouts/App.astro';
+import Spinner from '../components/Spinner.astro';
+import { BANDAS, PRESETS } from '../data/mock';
+const card = 'bg-neutral-primary-soft border border-default rounded-base shadow-xs p-5';
+const label = 'font-mono text-[11px] tracking-[.14em] text-brand uppercase';
+const range = 'w-full h-2 bg-neutral-quaternary rounded-full appearance-none cursor-pointer accent-[#10F5A0]';
+---
+<App title="Sonido" active="Sonido">
+<!-- Nivel básico: Sonido no está disponible (revelación progresiva) -->
+<div data-niveles="basico" class="p-6 rounded-base bg-warning-soft border border-amber/50" role="alert">
+  <p class="font-heading font-bold text-heading text-lg">Sonido no está disponible en el nivel básico</p>
+  <p class="text-sm mt-1">El ajuste de audio puede afectar lo que escuchan los oyentes. Cambia a Intermedio desde el selector de nivel o vuelve a la <a href="/" class="text-brand font-semibold underline">Cabina</a>.</p>
+</div>
+
+<div data-niveles="intermedio avanzado" class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+  <section class={`${card} lg:col-span-8`}>
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div><p class={label}>Ecualizador de la emisora · 5 bandas</p><h1 class="font-heading font-bold text-heading text-2xl mt-1">Sonido al aire</h1>
+        <p class="text-sm mt-1">Mueve las bandas y escucha en tus audífonos antes de aplicar.</p></div>
+      <span id="pendientes" class="hidden bg-warning-soft text-fg-warning border border-amber/40 text-xs font-semibold px-2.5 py-1 rounded-full">Cambios sin aplicar</span>
+    </div>
+    <p class="text-sm font-medium text-heading mt-5 mb-2">Ajustes rápidos</p>
+    <div id="presets" class="flex flex-wrap gap-2">
+      {Object.keys(PRESETS).map((p, i) => <button type="button" data-p={p} class={`preset text-sm px-3 py-1.5 rounded-full border ${i === 2 ? 'bg-brand text-gray-950 border-brand font-bold' : 'border-default bg-neutral-tertiary text-heading hover:bg-neutral-tertiary-medium'}`}>{p}</button>)}
+    </div>
+    <div class="grid grid-cols-5 gap-4 mt-6 p-5 rounded-base bg-neutral-tertiary border border-default">
+      {BANDAS.map((b, i) => (
+        <div class="flex flex-col items-center gap-3">
+          <span class="db font-mono text-sm font-bold text-heading tabular" data-i={i}>0 dB</span>
+          <input type="range" min="-12" max="12" step="1" value="0" data-i={i} aria-label={`Banda ${b}`} class="eq eq-range bg-neutral-quaternary rounded-full appearance-none cursor-pointer accent-[#10F5A0]" />
+          <span class="font-mono text-xs">{b}</span>
+        </div>
+      ))}
+    </div>
+    <div class="flex flex-wrap items-center justify-between gap-3 mt-5">
+      <label class="inline-flex items-center gap-3 cursor-pointer">
+        <input id="preescucha" type="checkbox" class="sr-only peer" />
+        <div class="relative w-9 h-5 bg-neutral-quaternary peer-focus:ring-4 peer-focus:ring-brand-medium rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand"></div>
+        <span class="text-sm text-heading">Escuchar en audífonos (no sale al aire)</span>
+      </label>
+      <div class="flex gap-3">
+        <button id="btn-descartar" type="button" class="inline-flex items-center text-heading bg-neutral-tertiary border border-default hover:bg-neutral-tertiary-medium font-medium rounded-base text-sm px-4 py-2.5">Descartar</button>
+        <button id="btn-aplicar" type="button" class="press inline-flex items-center text-gray-950 bg-brand hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium font-bold rounded-base text-sm px-5 py-2.5 focus:outline-none"><span class="spin hidden"><Spinner /></span><span class="txt">Aplicar al aire</span></button>
+      </div>
+    </div>
+  </section>
+
+  <div class="lg:col-span-4 space-y-4">
+    <section class={card}>
+      <p class={`${label} mb-3`}>Salida al aire</p>
+      <div class="flex items-baseline gap-2"><span id="lufs" class="font-mono font-bold text-heading text-4xl tabular">-16.2</span><span class="text-xs">LUFS-I</span><span id="tp" class="font-mono font-bold text-heading text-xl ms-3 tabular">-1.4</span><span class="text-xs">dBTP</span></div>
+      <div class="w-full bg-neutral-tertiary-medium rounded-full h-2 mt-3"><div id="lufs-bar" class="bg-brand h-2 rounded-full transition-[width] duration-150" style="width:78%"></div></div>
+      <p class="text-xs mt-2">Objetivo de la emisora: −16 LUFS · techo −1 dBTP</p>
+    </section>
+    <!-- Solo avanzado: compresor y limitador -->
+    <section class={card} data-niveles="avanzado">
+      <p class={`${label} mb-3`}>Procesamiento · avanzado</p>
+      {[['Umbral del compresor', 'umbral', -40, 0, -18, 'dB'], ['Relación', 'ratio', 1, 10, 3, ':1'], ['Techo del limitador', 'techo', -3, 0, -1, 'dBTP']].map(([t, id, mn, mx, v, u]) => (
+        <div class="mb-4">
+          <div class="flex justify-between text-sm mb-1"><label for={`av-${id}`} class="text-heading">{t}</label><span class="font-mono text-heading"><span id={`v-${id}`}>{v}</span> {u}</span></div>
+          <input id={`av-${id}`} type="range" min={mn} max={mx} step={id === 'techo' ? 0.1 : 1} value={v} class={`av ${range}`} data-id={id} />
+        </div>
+      ))}
+    </section>
+    <section class={card}>
+      <p class={`${label} mb-2`}>Historial</p>
+      <ol id="historial" class="text-sm space-y-1.5"><li><span class="font-mono text-xs text-brand me-2">09:12</span>Preset «Música andina» aplicado</li></ol>
+    </section>
+  </div>
+</div>
+<script src="../scripts/sonido.ts"></script>
+</App>

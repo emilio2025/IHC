@@ -1,0 +1,66 @@
+@import "tailwindcss";
+@import "flowbite/src/themes/default";
+@plugin "flowbite/plugin";
+@source "../../node_modules/flowbite";
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ===== Lenguaje visual V8 sobre los tokens de Flowbite =====
+   Solo se reemplazan valores de tokens; los componentes y clases
+   son los de Flowbite (bg-brand, text-heading, border-default…). */
+@theme {
+  --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: 'Sora', 'Manrope', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --color-mint: #10F5A0;
+  --color-aqua: #22D3EE;
+  --color-onair: #FF3B4E;
+  --color-amber: #FFC24B;
+}
+.dark {
+  --color-heading: #F2FFF9;
+  --color-body: #A9BAB4;
+  --color-body-subtle: #8FA39D;
+  --color-neutral-primary: #05080A;          /* fondo de página */
+  --color-neutral-primary-soft: #0B1513;     /* tarjetas */
+  --color-neutral-primary-medium: #12201C;
+  --color-neutral-primary-strong: #1A2C27;
+  --color-neutral-secondary-medium: #12201C;
+  --color-neutral-tertiary: #12201C;
+  --color-neutral-tertiary-medium: #1A2C27;
+  --color-default: #1D2E29;                  /* bordes */
+  --color-default-medium: #2A3F39;
+  --color-brand: #10F5A0;                    /* menta V8 */
+  --color-brand-strong: #0CCB84;
+  --color-brand-medium: #0B4D36;             /* anillo de foco */
+  --color-brand-soft: #0D2A20;
+  --color-fg-brand: #10F5A0;
+  --color-danger: #D91E36;                   /* 5.0:1 con texto blanco */
+  --color-danger-strong: #A3142A;
+  --color-danger-medium: #5A1420;
+  --color-danger-soft: #2A0E13;
+  --color-fg-danger: #FF8A96;
+  --color-warning: #FFC24B;
+  --color-warning-soft: #2A2110;
+  --color-fg-warning: #FFC24B;
+  --color-success-soft: #0D2A20;
+  --color-fg-success: #10F5A0;
+}
+html { background: var(--color-neutral-primary); }
+.font-heading { font-family: var(--font-heading); }
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* Bucle perceptual (Actividad 10): fase 2 en el mismo cuadro del clic */
+.press { transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease; }
+.press:hover:not(:disabled) { transform: scale(1.02); }
+.press:active:not(:disabled) { transition: none; transform: scale(.97); box-shadow: inset 0 3px 6px rgb(0 0 0 / .45); }
+.glow-onair { box-shadow: 0 0 0 2px rgb(255 255 255 / .6), 0 0 32px rgb(255 59 78 / .7); }
+.glow-amber { box-shadow: 0 0 22px rgb(255 194 75 / .45); }
+@keyframes pulse-dot { 0%,100% { opacity: 1; transform: scale(1);} 50% { opacity: .35; transform: scale(.8);} }
+.pulse-dot { animation: pulse-dot 1s ease-in-out infinite; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+.shake { animation: shake 240ms ease 2; }
+.vu-seg { transition: opacity 60ms linear; }
+
+/* Deslizador vertical del ecualizador (input range de Flowbite girado) */
+.eq-range { writing-mode: vertical-lr; direction: rtl; width: 8px; height: 160px; }
